@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>UK Family Mission Dashboard 🇬🇧</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: white;
+    text-align: center;
+}
+
+header {
+    padding: 30px;
+    background: rgba(0,0,0,0.3);
+}
+
+h1 {
+    margin: 0;
+    font-size: 38px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    padding: 20px;
+}
+
+.card {
+    background: rgba(255,255,255,0.1);
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(12px);
+}
+
+input, button {
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    margin: 5px;
+}
+
+button {
+    background: #00c6ff;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0072ff;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    padding: 10px;
+    margin: 5px 0;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.progress-bar {
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    height: 25px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #00ff88;
+    width: 0%;
+    transition: width 0.4s ease;
+}
+
+footer {
+    padding: 20px;
+    font-size: 14px;
+    opacity: 0.6;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🇬🇧 UK Family Mission Dashboard</h1>
+<p>Private Tracker for Our UK Move 🚀</p>
+</header>
+
+<div class="container">
+
+<div class="card">
+<h2>📅 Move Countdown</h2>
+<input type="date" id="moveDate">
+<button onclick="setDate()">Set Date</button>
+<h3 id="countdown"></h3>
+</div>
+
+<div class="card">
+<h2>📝 Mission Checklist</h2>
+<input type="text" id="taskInput" placeholder="Add task">
+<button onclick="addTask()">Add</button>
+<ul id="taskList"></ul>
+
+<h3>Mission Progress</h3>
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+<p id="progressText">0% Complete</p>
+</div>
+
+<div class="card">
+<h2>💰 Budget Tracker (£)</h2>
+<input type="number" id="budgetInput" placeholder="Add expense">
+<button onclick="addExpense()">Add</button>
+<h3>Total: £<span id="totalBudget">0</span></h3>
+</div>
+
+<div class="card">
+<h2>📍 Target City</h2>
+<h3>Reading, UK 🇬🇧</h3>
+<p>Future Base Location 👑</p>
+</div>
+
+</div>
+
+<footer>
+Built by Ishan 💻 | Family UK Mission 🇬🇧
+</footer>
+
+<script>
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+let totalBudget = parseInt(localStorage.getItem("budget")) || 0;
+let moveDate = localStorage.getItem("moveDate");
+
+function saveData() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+    localStorage.setItem("budget", totalBudget);
+    localStorage.setItem("moveDate", moveDate);
+}
+
+function setDate() {
+    moveDate = document.getElementById("moveDate").value;
+    saveData();
+    updateCountdown();
+}
+
+function updateCountdown() {
+    if (!moveDate) return;
+    const diff = new Date(moveDate) - new Date();
+    const days = Math.ceil(diff / (1000*60*60*24));
+    document.getElementById("countdown").innerText =
+        days > 0 ? days + " days to UK 🇬🇧" : "Welcome to the UK! 🎉";
+}
+
+function addTask() {
+    const input = document.getElementById("taskInput");
+    if (!input.value) return;
+    tasks.push({ text: input.value, done: false });
+    input.value = "";
+    renderTasks();
+}
+
+function renderTasks() {
+    const list = document.getElementById("taskList");
+    list.innerHTML = "";
+    tasks.forEach((task, index) => {
+        const li = document.createElement("li");
+        li.textContent = task.text;
+        if (task.done) li.style.textDecoration = "line-through";
+        li.onclick = () => {
+            tasks[index].done = !tasks[index].done;
+            renderTasks();
+        };
+        list.appendChild(li);
+    });
+    updateProgress();
+    saveData();
+}
+
+function updateProgress() {
+    if (tasks.length === 0) return;
+    const completed = tasks.filter(t => t.done).length;
+    const percent = Math.round((completed / tasks.length) * 100);
+    document.getElementById("progressFill").style.width = percent + "%";
+    document.getElementById("progressText").innerText = percent + "% Complete";
+}
+
+function addExpense() {
+    const input = document.getElementById("budgetInput");
+    if (!input.value) return;
+    totalBudget += parseInt(input.value);
+    input.value = "";
+    document.getElementById("totalBudget").innerText = totalBudget;
+    saveData();
+}
+
+document.getElementById("totalBudget").innerText = totalBudget;
+renderTasks();
+updateCountdown();
+</script>
+
+</body>
+</html>
