@@ -167,16 +167,36 @@ function addTask() {
 function renderTasks() {
     const list = document.getElementById("taskList");
     list.innerHTML = "";
+
     tasks.forEach((task, index) => {
         const li = document.createElement("li");
-        li.textContent = task.text;
-        if (task.done) li.style.textDecoration = "line-through";
-        li.onclick = () => {
+        li.style.display = "flex";
+        li.style.justifyContent = "space-between";
+        li.style.alignItems = "center";
+
+        const span = document.createElement("span");
+        span.textContent = task.text;
+        if (task.done) span.style.textDecoration = "line-through";
+
+        span.onclick = () => {
             tasks[index].done = !tasks[index].done;
             renderTasks();
         };
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "❌";
+        deleteBtn.style.background = "#ff4d4d";
+        deleteBtn.style.padding = "5px 10px";
+        deleteBtn.onclick = () => {
+            tasks.splice(index, 1);
+            renderTasks();
+        };
+
+        li.appendChild(span);
+        li.appendChild(deleteBtn);
         list.appendChild(li);
     });
+
     updateProgress();
     saveData();
 }
