@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>UK Family Mission Dashboard 🇬🇧</title>
+<title>Private UK Mission Dashboard 🇬🇧</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -14,14 +14,8 @@ body {
     text-align: center;
 }
 
-header {
-    padding: 30px;
-    background: rgba(0,0,0,0.3);
-}
-
-h1 {
-    margin: 0;
-    font-size: 38px;
+.hidden {
+    display: none;
 }
 
 .container {
@@ -56,19 +50,6 @@ button:hover {
     background: #0072ff;
 }
 
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-li {
-    padding: 10px;
-    margin: 5px 0;
-    background: rgba(255,255,255,0.15);
-    border-radius: 8px;
-    cursor: pointer;
-}
-
 .progress-bar {
     background: rgba(255,255,255,0.2);
     border-radius: 10px;
@@ -82,20 +63,27 @@ li {
     width: 0%;
     transition: width 0.4s ease;
 }
-
-footer {
-    padding: 20px;
-    font-size: 14px;
-    opacity: 0.6;
-}
 </style>
 </head>
 
 <body>
 
+<!-- 🔐 LOGIN SCREEN -->
+<div id="loginScreen" class="container">
+    <div class="card">
+        <h1>🔐 Private UK Mission Access</h1>
+        <p>Enter family password</p>
+        <input type="password" id="passwordInput" placeholder="Password">
+        <button onclick="checkPassword()">Enter</button>
+        <p id="errorMessage" style="color: #ff6b6b;"></p>
+    </div>
+</div>
+
+<!-- 🇬🇧 MAIN DASHBOARD -->
+<div id="dashboard" class="hidden">
+
 <header>
 <h1>🇬🇧 UK Family Mission Dashboard</h1>
-<p>Private Tracker for Our UK Move 🚀</p>
 </header>
 
 <div class="container">
@@ -120,33 +108,37 @@ footer {
 <p id="progressText">0% Complete</p>
 </div>
 
-<div class="card">
-<h2>💰 Budget Tracker (£)</h2>
-<input type="number" id="budgetInput" placeholder="Add expense">
-<button onclick="addExpense()">Add</button>
-<h3>Total: £<span id="totalBudget">0</span></h3>
 </div>
-
-<div class="card">
-<h2>📍 Target City</h2>
-<h3>Reading, UK 🇬🇧</h3>
-<p>Future Base Location 👑</p>
 </div>
-
-</div>
-
-<footer>
-Built by Ishan 💻 | Family UK Mission 🇬🇧
-</footer>
 
 <script>
+
+// 🔐 CHANGE THIS PASSWORD
+const correctPassword = "UK786";  // <-- change this
+
+function checkPassword() {
+    const input = document.getElementById("passwordInput").value;
+    if (input === correctPassword) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("dashboard").classList.remove("hidden");
+        localStorage.setItem("authenticated", "true");
+    } else {
+        document.getElementById("errorMessage").innerText = "Wrong password!";
+    }
+}
+
+// Keep logged in
+if (localStorage.getItem("authenticated") === "true") {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("dashboard").classList.remove("hidden");
+}
+
+// --- Dashboard Logic ---
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let totalBudget = parseInt(localStorage.getItem("budget")) || 0;
 let moveDate = localStorage.getItem("moveDate");
 
 function saveData() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
-    localStorage.setItem("budget", totalBudget);
     localStorage.setItem("moveDate", moveDate);
 }
 
@@ -197,18 +189,9 @@ function updateProgress() {
     document.getElementById("progressText").innerText = percent + "% Complete";
 }
 
-function addExpense() {
-    const input = document.getElementById("budgetInput");
-    if (!input.value) return;
-    totalBudget += parseInt(input.value);
-    input.value = "";
-    document.getElementById("totalBudget").innerText = totalBudget;
-    saveData();
-}
-
-document.getElementById("totalBudget").innerText = totalBudget;
 renderTasks();
 updateCountdown();
+
 </script>
 
 </body>
