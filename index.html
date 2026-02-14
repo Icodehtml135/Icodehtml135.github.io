@@ -1,113 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Private UK Mission Dashboard 🇬🇧</title>
+<title>UK Mission Dashboard PRO 🇬🇧</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: white;
-    text-align: center;
+  margin:0;
+  font-family:Segoe UI, sans-serif;
+  background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color:white;
+  text-align:center;
 }
 
-.hidden {
-    display: none;
+.light-mode {
+  background:#f5f5f5;
+  color:#222;
+}
+.light-mode .card {
+  background:rgba(0,0,0,0.05);
 }
 
-.container {
-    max-width: 1000px;
-    margin: auto;
-    padding: 20px;
-}
+.hidden { display:none; }
+
+.container { max-width:1000px; margin:auto; padding:20px; }
 
 .card {
-    background: rgba(255,255,255,0.1);
-    margin: 20px 0;
-    padding: 20px;
-    border-radius: 15px;
-    backdrop-filter: blur(12px);
+  background:rgba(255,255,255,0.1);
+  padding:20px;
+  margin:20px 0;
+  border-radius:15px;
+  backdrop-filter:blur(10px);
 }
 
-input, button {
-    padding: 10px;
-    border-radius: 8px;
-    border: none;
-    margin: 5px;
+input,button,select {
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  margin:5px;
 }
 
-button {
-    background: #00c6ff;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0072ff;
-}
+button { cursor:pointer; font-weight:bold; }
 
 .progress-bar {
-    background: rgba(255,255,255,0.2);
-    border-radius: 10px;
-    overflow: hidden;
-    height: 25px;
+  background:rgba(255,255,255,0.2);
+  height:20px;
+  border-radius:10px;
+  overflow:hidden;
 }
 
 .progress-fill {
-    height: 100%;
-    background: #00ff88;
-    width: 0%;
-    transition: width 0.4s ease;
+  height:100%;
+  width:0%;
+  background:#00ff88;
+  transition:0.4s;
+}
+
+.task-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:5px 0;
+  background:rgba(255,255,255,0.15);
+  padding:8px;
+  border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- 🔐 LOGIN SCREEN -->
+<!-- LOGIN -->
 <div id="loginScreen" class="container">
-    <div class="card">
-        <h1>🔐 Private UK Mission Access</h1>
-        <p>Enter family password</p>
-        <input type="password" id="passwordInput" placeholder="Password">
-        <button onclick="checkPassword()">Enter</button>
-        <p id="errorMessage" style="color: #ff6b6b;"></p>
-    </div>
+<div class="card">
+<h1>🔐 UK Mission PRO Access</h1>
+<input type="password" id="passwordInput" placeholder="Password">
+<button onclick="login()">Enter</button>
+<p id="error" style="color:#ff6b6b;"></p>
+</div>
 </div>
 
-<!-- 🇬🇧 MAIN DASHBOARD -->
+<!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
 
-<header>
-<h1>🇬🇧 UK Family Mission Dashboard</h1>
-<button onclick="logout()" style="position:absolute; top:20px; right:20px; background:#ff4d4d;">
-🔓 Sign Out
-</button>
-</header>
+<div style="text-align:right; padding:10px;">
+<button onclick="toggleTheme()">🌙 Theme</button>
+<button onclick="logout()" style="background:#ff4d4d;">Sign Out</button>
+</div>
+
+<h1>🇬🇧 UK Mission Dashboard PRO</h1>
+
 <div class="container">
 
+<!-- COUNTDOWN -->
 <div class="card">
 <h2>📅 Move Countdown</h2>
 <input type="date" id="moveDate">
-<button onclick="setDate()">Set Date</button>
+<button onclick="setDate()">Set</button>
 <h3 id="countdown"></h3>
 </div>
 
+<!-- TASK MANAGER -->
 <div class="card">
-<h2>📝 Mission Checklist</h2>
+<h2>📝 Mission Tasks</h2>
 <input type="text" id="taskInput" placeholder="Add task">
+<select id="roleSelect">
+<option value="All">All</option>
+<option value="Parent">Parent</option>
+<option value="Ishan">Ishan</option>
+</select>
 <button onclick="addTask()">Add</button>
-<ul id="taskList"></ul>
+<button onclick="clearCompleted()">Clear Completed</button>
 
-<h3>Mission Progress</h3>
+<div id="taskList"></div>
+
+<h3 id="taskCounter"></h3>
+
 <div class="progress-bar">
-<div class="progress-fill" id="progressFill"></div>
+<div id="progressFill" class="progress-fill"></div>
 </div>
-<p id="progressText">0% Complete</p>
+<p id="progressText"></p>
+<h3 id="missionStatus"></h3>
+</div>
+
+<!-- BUDGET -->
+<div class="card">
+<h2>💰 Budget Tracker (£)</h2>
+<input type="number" id="budgetInput" placeholder="Add expense">
+<button onclick="addExpense()">Add</button>
+<h3>Total: £<span id="totalBudget">0</span></h3>
+</div>
+
+<!-- HOUSE TRACKER -->
+<div class="card">
+<h2>🏠 House Hunting</h2>
+<input type="text" id="houseInput" placeholder="Add property address">
+<button onclick="addHouse()">Add</button>
+<ul id="houseList"></ul>
+</div>
+
+<!-- VISA TRACKER -->
+<div class="card">
+<h2>📄 Visa Progress</h2>
+<select id="visaStage" onchange="saveVisa()">
+<option>Researching</option>
+<option>Documents Ready</option>
+<option>Applied</option>
+<option>Approved</option>
+</select>
+<h3 id="visaStatus"></h3>
 </div>
 
 </div>
@@ -115,106 +157,163 @@ button:hover {
 
 <script>
 
-// 🔐 CHANGE THIS PASSWORD
-const correctPassword = "UK786";  // <-- change this
+// LOGIN
+const password="UK786";
 
-function checkPassword() {
-    const input = document.getElementById("passwordInput").value;
-    if (input === correctPassword) {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("dashboard").classList.remove("hidden");
-        localStorage.setItem("authenticated", "true");
-    } else {
-        document.getElementById("errorMessage").innerText = "Wrong password!";
-    }
+function login(){
+  if(document.getElementById("passwordInput").value===password){
+    localStorage.setItem("auth","true");
+    showDashboard();
+  }else{
+    document.getElementById("error").innerText="Wrong password!";
+  }
 }
 
-// Keep logged in
-if (localStorage.getItem("authenticated") === "true") {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("dashboard").classList.remove("hidden");
+function logout(){
+  localStorage.removeItem("auth");
+  location.reload();
 }
 
-// --- Dashboard Logic ---
-let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-let moveDate = localStorage.getItem("moveDate");
-
-function saveData() {
-    localStorage.setItem("tasks", JSON.stringify(tasks));
-    localStorage.setItem("moveDate", moveDate);
+function showDashboard(){
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("dashboard").classList.remove("hidden");
 }
 
-function setDate() {
-    moveDate = document.getElementById("moveDate").value;
-    saveData();
-    updateCountdown();
+if(localStorage.getItem("auth")==="true") showDashboard();
+
+// THEME
+function toggleTheme(){
+  document.body.classList.toggle("light-mode");
 }
 
-function updateCountdown() {
-    if (!moveDate) return;
-    const diff = new Date(moveDate) - new Date();
-    const days = Math.ceil(diff / (1000*60*60*24));
-    document.getElementById("countdown").innerText =
-        days > 0 ? days + " days to UK 🇬🇧" : "Welcome to the UK! 🎉";
+// COUNTDOWN
+let moveDate=localStorage.getItem("moveDate");
+
+function setDate(){
+  moveDate=document.getElementById("moveDate").value;
+  localStorage.setItem("moveDate",moveDate);
+  updateCountdown();
 }
 
-function addTask() {
-    const input = document.getElementById("taskInput");
-    if (!input.value) return;
-    tasks.push({ text: input.value, done: false });
-    input.value = "";
-    renderTasks();
+function updateCountdown(){
+  if(!moveDate) return;
+  let diff=new Date(moveDate)-new Date();
+  let days=Math.ceil(diff/(1000*60*60*24));
+  document.getElementById("countdown").innerText=
+    days>0?days+" days to UK 🇬🇧":"Welcome to UK 🎉";
 }
-
-function renderTasks() {
-    const list = document.getElementById("taskList");
-    list.innerHTML = "";
-
-    tasks.forEach((task, index) => {
-        const li = document.createElement("li");
-        li.style.display = "flex";
-        li.style.justifyContent = "space-between";
-        li.style.alignItems = "center";
-
-        const span = document.createElement("span");
-        span.textContent = task.text;
-        if (task.done) span.style.textDecoration = "line-through";
-
-        span.onclick = () => {
-            tasks[index].done = !tasks[index].done;
-            renderTasks();
-        };
-
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "❌";
-        deleteBtn.style.background = "#ff4d4d";
-        deleteBtn.style.padding = "5px 10px";
-        deleteBtn.onclick = () => {
-            tasks.splice(index, 1);
-            renderTasks();
-        };
-
-        li.appendChild(span);
-        li.appendChild(deleteBtn);
-        list.appendChild(li);
-    });
-
-    updateProgress();
-    saveData();
-}
-
-function updateProgress() {
-    if (tasks.length === 0) return;
-    const completed = tasks.filter(t => t.done).length;
-    const percent = Math.round((completed / tasks.length) * 100);
-    document.getElementById("progressFill").style.width = percent + "%";
-    document.getElementById("progressText").innerText = percent + "% Complete";
-}
-
-renderTasks();
 updateCountdown();
 
-</script>
+// TASKS
+let tasks=JSON.parse(localStorage.getItem("tasks"))||[];
 
+function saveTasks(){
+  localStorage.setItem("tasks",JSON.stringify(tasks));
+}
+
+function addTask(){
+  let text=document.getElementById("taskInput").value;
+  let role=document.getElementById("roleSelect").value;
+  if(!text) return;
+  tasks.push({text,done:false,role});
+  document.getElementById("taskInput").value="";
+  renderTasks();
+}
+
+function renderTasks(){
+  let list=document.getElementById("taskList");
+  list.innerHTML="";
+  tasks.forEach((t,i)=>{
+    let row=document.createElement("div");
+    row.className="task-row";
+
+    let span=document.createElement("span");
+    span.innerText=t.text+" ("+t.role+")";
+    if(t.done) span.style.textDecoration="line-through";
+    span.onclick=()=>{tasks[i].done=!tasks[i].done;renderTasks();};
+
+    let del=document.createElement("button");
+    del.innerText="❌";
+    del.onclick=()=>{tasks.splice(i,1);renderTasks();};
+
+    row.appendChild(span);
+    row.appendChild(del);
+    list.appendChild(row);
+  });
+
+  document.getElementById("taskCounter").innerText="Total Tasks: "+tasks.length;
+  updateProgress();
+  saveTasks();
+}
+
+function clearCompleted(){
+  tasks=tasks.filter(t=>!t.done);
+  renderTasks();
+}
+
+function updateProgress(){
+  if(tasks.length===0) return;
+  let done=tasks.filter(t=>t.done).length;
+  let percent=Math.round(done/tasks.length*100);
+  document.getElementById("progressFill").style.width=percent+"%";
+  document.getElementById("progressText").innerText=percent+"% Complete";
+
+  let status=document.getElementById("missionStatus");
+  if(percent<30) status.innerText="🚧 Starting";
+  else if(percent<70) status.innerText="⚡ In Progress";
+  else if(percent<100) status.innerText="🔥 Almost Ready";
+  else status.innerText="🎉 Mission Complete!";
+}
+renderTasks();
+
+// BUDGET
+let total=localStorage.getItem("budget")||0;
+document.getElementById("totalBudget").innerText=total;
+
+function addExpense(){
+  let val=parseInt(document.getElementById("budgetInput").value);
+  if(!val) return;
+  total=parseInt(total)+val;
+  localStorage.setItem("budget",total);
+  document.getElementById("totalBudget").innerText=total;
+  document.getElementById("budgetInput").value="";
+}
+
+// HOUSE
+let houses=JSON.parse(localStorage.getItem("houses"))||[];
+
+function addHouse(){
+  let h=document.getElementById("houseInput").value;
+  if(!h) return;
+  houses.push(h);
+  localStorage.setItem("houses",JSON.stringify(houses));
+  renderHouses();
+  document.getElementById("houseInput").value="";
+}
+
+function renderHouses(){
+  let list=document.getElementById("houseList");
+  list.innerHTML="";
+  houses.forEach((h,i)=>{
+    let li=document.createElement("li");
+    li.innerText=h;
+    li.onclick=()=>{houses.splice(i,1);localStorage.setItem("houses",JSON.stringify(houses));renderHouses();};
+    list.appendChild(li);
+  });
+}
+renderHouses();
+
+// VISA
+let visa=localStorage.getItem("visa")||"Researching";
+document.getElementById("visaStage").value=visa;
+document.getElementById("visaStatus").innerText="Current Stage: "+visa;
+
+function saveVisa(){
+  visa=document.getElementById("visaStage").value;
+  localStorage.setItem("visa",visa);
+  document.getElementById("visaStatus").innerText="Current Stage: "+visa;
+}
+
+</script>
 </body>
 </html>
